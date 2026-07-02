@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安全风险与隐患排查 - 赤特机电内部学习平台</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;color:#1c1917;background:#f5f5f4;line-height:1.7}
+
+/* 导航栏 */
+.nav{background:#fff;border-bottom:1px solid #e7e5e4;padding:.7rem 1.2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.nav a.back{color:#b91c1c;text-decoration:none;font-size:.85rem;font-weight:600;white-space:nowrap}
+.nav a.back:hover{text-decoration:underline}
+.nav .breadcrumb{color:#78716c;font-size:.85rem}
+.nav .breadcrumb span{color:#1c1917;font-weight:500}
+
+/* 页面标题 */
+.page-title{text-align:center;padding:2rem 1rem 1.2rem;background:linear-gradient(135deg,#b91c1c,#991b1b);color:#fff}
+.page-title h1{font-size:1.6rem;font-weight:700}
+.page-title p{font-size:.9rem;opacity:.85;margin-top:.3rem}
+
+/* 主内容区 */
+.main{max-width:960px;margin:0 auto;padding:1.5rem 1rem 3rem}
+
+/* ========== 折叠章节（CSS checkbox hack）========== */
+.section{margin-bottom:1.2rem}
+.section input[type="checkbox"]{display:none}
+.section .toggle-btn{display:flex;align-items:center;gap:.5rem;width:100%;background:#fff;border:1px solid #e7e5e4;border-radius:8px;padding:.9rem 1.2rem;font-size:1.05rem;font-weight:700;color:#1c1917;cursor:pointer;transition:all .2s;text-align:left;user-select:none}
+.section .toggle-btn:hover{border-color:#b91c1c;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.section .toggle-btn .arrow{display:inline-block;transition:transform .25s;font-size:.8rem;color:#78716c;margin-left:auto}
+.section input:checked ~ .toggle-btn .arrow{transform:rotate(90deg)}
+.section .toggle-btn .num{display:inline-flex;align-items:center;justify-content:center;width:1.8rem;height:1.8rem;background:#b91c1c;color:#fff;border-radius:50%;font-size:.75rem;font-weight:700;flex-shrink:0}
+.section .content{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.section input:checked ~ .content{max-height:50000px}
+
+/* 子类卡片 */
+.sub-card{margin:.8rem 0;background:#fff;border-radius:8px;border:1px solid #e7e5e4;overflow:hidden}
+.sub-card input[type="checkbox"]{display:none}
+.sub-card .sub-toggle{display:flex;align-items:center;gap:.5rem;width:100%;padding:.75rem 1rem;font-size:.95rem;font-weight:600;cursor:pointer;text-align:left;user-select:none;transition:background .15s}
+.sub-card .sub-toggle:hover{background:#fafaf9}
+.sub-card .sub-toggle .sub-arrow{display:inline-block;transition:transform .25s;font-size:.7rem;color:#78716c;margin-left:auto}
+.sub-card input:checked ~ .sub-toggle .sub-arrow{transform:rotate(90deg)}
+.sub-card .sub-content{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.sub-card input:checked ~ .sub-content{max-height:50000px}
+
+/* 左边框颜色 */
+.border-red .sub-toggle{border-left:4px solid #dc2626}
+.border-orange .sub-toggle{border-left:4px solid #ea580c}
+.border-yellow .sub-toggle{border-left:4px solid #ca8a04}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:0}
+table thead th{background:#fecaca;color:#7f1d1d;font-weight:600;padding:.6rem .8rem;text-align:left;border-bottom:2px solid #fca5a5;white-space:nowrap}
+table tbody td{padding:.6rem .8rem;border-bottom:1px solid #f5f5f4;vertical-align:top;line-height:1.6}
+table tbody tr:last-child td{border-bottom:none}
+table tbody tr:hover{background:#fefce8}
+.hazard-name{font-weight:600;white-space:nowrap;color:#1c1917;min-width:80px}
+.case-text{color:#44403c}
+.prevention{color:#166534;font-weight:500}
+
+/* 章节四：卡片式布局 */
+.risk-card{background:#fff;border-radius:8px;border:1px solid #e7e5e4;padding:1rem 1.2rem;margin:.7rem 0}
+.risk-card .risk-title{display:flex;align-items:center;gap:.5rem;font-size:.95rem;font-weight:700;margin-bottom:.5rem}
+.risk-card .risk-title .badge{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.7rem;font-weight:700;color:#fff}
+.badge-critical{background:#dc2626}
+.badge-high{background:#ea580c}
+.badge-medium{background:#ca8a04}
+.risk-card .risk-desc{font-size:.85rem;color:#44403c;margin-bottom:.4rem}
+.risk-card .risk-measure{font-size:.83rem;color:#166534;line-height:1.6}
+
+/* 章节五：检查清单 */
+.check-group{margin:.8rem 0}
+.check-group h4{font-size:.95rem;font-weight:700;color:#1c1917;margin-bottom:.6rem;padding:.4rem .8rem;background:#dcfce7;border-radius:6px;display:flex;align-items:center;gap:.4rem}
+.check-group h4 .check-icon{color:#16a34a;font-weight:700}
+.check-list{list-style:none;padding:0 .5rem}
+.check-list li{position:relative;padding:.4rem 0 .4rem 1.8rem;font-size:.85rem;color:#44403c;line-height:1.6}
+.check-list li::before{content:"\2713";position:absolute;left:0;color:#16a34a;font-weight:700;font-size:1rem}
+
+/* 四要素五必须框 */
+.highlight-box{background:#fff;border:2px solid #16a34a;border-radius:8px;padding:1rem 1.2rem;margin:.8rem 0}
+.highlight-box h4{font-size:.95rem;font-weight:700;color:#166534;margin-bottom:.5rem}
+.highlight-box .hl-items{display:flex;flex-wrap:wrap;gap:.5rem}
+.highlight-box .hl-item{background:#dcfce7;border:1px solid #bbf7d0;border-radius:6px;padding:.4rem .8rem;font-size:.83rem;font-weight:600;color:#166534}
+.highlight-box .hl-label{font-size:.85rem;color:#44403c;margin-top:.6rem;margin-bottom:.3rem;font-weight:600}
+
+/* 底部提示 */
+.alert-box{background:#b91c1c;color:#fff;padding:1rem 1.2rem;border-radius:8px;margin-top:2rem;font-size:.88rem;line-height:1.7;text-align:center;font-weight:500;position:relative;box-shadow:0 4px 12px rgba(185,28,28,.25)}
+
+/* 页脚 */
+.footer{text-align:center;padding:2rem 1rem;color:#a8a29e;font-size:.75rem}
+
+/* 响应式 */
+@media(max-width:640px){
+  .page-title h1{font-size:1.3rem}
+  .nav{padding:.6rem .8rem}
+  .main{padding:1rem .5rem 2rem}
+  table{font-size:.78rem}
+  table thead th,table tbody td{padding:.5rem .5rem}
+  .highlight-box .hl-items{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="nav">
+  <a href="../index.html" class="back">&larr; 首页</a>
+  <div class="breadcrumb">首页 / <span>安全风险隐患</span></div>
+</nav>
+
+<!-- 页面标题 -->
+<div class="page-title">
+  <h1>安全风险与隐患排查</h1>
+  <p>典型案例警示 &middot; 隐患分类识别 &middot; 排查要点汇总</p>
+</div>
+
+<!-- 主内容 -->
+<div class="main">
+
+<!-- ====== 章节一：电梯常见安全隐患 ====== -->
+<div class="section">
+<input type="checkbox" id="s1" checked>
+<label class="toggle-btn" for="s1">
+  <span class="num">1</span> 电梯常见安全隐患
+  <span class="arrow">&#9654;</span>
+</label>
+<div class="content">
+
+<!-- 1.1 坠落风险 -->
+<div class="sub-card border-red">
+<input type="checkbox" id="s1a" checked>
+<label class="sub-toggle" for="s1a">
+  1.1 坠落风险
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">钢丝绳断裂</td>
+  <td class="case-text">2023年上海闵行区废弃电梯拆除作业中，电梯升降钢索突然断裂，轿厢坠落致2人死亡</td>
+  <td class="prevention">定期检测断丝数量和磨损程度，超标立即更换</td>
+</tr>
+<tr>
+  <td class="hazard-name">制动器失效</td>
+  <td class="case-text">2025年2月昆明某小区电梯疑因故障冲顶，从17楼坠至负2楼又冲至33楼，致1人死亡</td>
+  <td class="prevention">定期检查制动器闸瓦磨损；确保制动力矩达标</td>
+</tr>
+<tr>
+  <td class="hazard-name">限速器-安全钳失效</td>
+  <td class="case-text">2026年1月广东阳江某公司电梯改造中限速器被外力撞击损坏，吊带断裂后轿厢自由坠落致1人死亡</td>
+  <td class="prevention">限速器每年校验标定；安全钳定期提拉试验</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 1.2 剪切挤压风险 -->
+<div class="sub-card border-orange">
+<input type="checkbox" id="s1b" checked>
+<label class="sub-toggle" for="s1b">
+  1.2 剪切挤压风险
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">厅门锁失效</td>
+  <td class="case-text">乘客扒开厅门踏空摔入底坑，因门锁电路被短接</td>
+  <td class="prevention">严禁短接门锁回路；定期检查门锁触点</td>
+</tr>
+<tr>
+  <td class="hazard-name">层门间隙超标</td>
+  <td class="case-text">2015年杭州新华坊电梯夹人致死事故</td>
+  <td class="prevention">间隙必须符合GB 7588标准；定期测量</td>
+</tr>
+<tr>
+  <td class="hazard-name">违规进入井道</td>
+  <td class="case-text">2025年云南曲靖作业人员违规使用三角钥匙打开层门，未做防护跌入井道被二次挤压死亡</td>
+  <td class="prevention">三角钥匙专人保管；进入井道必须断电设监护人</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 1.3 电气风险 -->
+<div class="sub-card border-yellow">
+<input type="checkbox" id="s1c" checked>
+<label class="sub-toggle" for="s1c">
+  1.3 电气风险
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">漏电</td>
+  <td class="case-text">电气线路老化、机房潮湿导致绝缘下降</td>
+  <td class="prevention">定期绝缘电阻检测（&ge;0.5M&Omega;）</td>
+</tr>
+<tr>
+  <td class="hazard-name">控制系统故障</td>
+  <td class="case-text">2024年贵州兴义市电梯从11楼冲顶到28楼致儿童受伤</td>
+  <td class="prevention">控制系统定期检测；加装冲顶保护装置</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- ====== 章节二：起重机械常见安全隐患 ====== -->
+<div class="section">
+<input type="checkbox" id="s2">
+<label class="toggle-btn" for="s2">
+  <span class="num">2</span> 起重机械常见安全隐患
+  <span class="arrow">&#9654;</span>
+</label>
+<div class="content">
+
+<!-- 2.1 吊装事故 -->
+<div class="sub-card border-red">
+<input type="checkbox" id="s2a" checked>
+<label class="sub-toggle" for="s2a">
+  2.1 吊装事故
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">钢丝绳断裂</td>
+  <td class="case-text">2025年7月深圳某工地塔吊吊运混凝土料斗时钢丝绳断裂，砸死作业人员</td>
+  <td class="prevention">按GB/T 5972标准判定报废；定期探伤</td>
+</tr>
+<tr>
+  <td class="hazard-name">脱钩</td>
+  <td class="case-text">2023年抚顺"11&middot;6"桥式起重机主钩坠落事故，致1死</td>
+  <td class="prevention">吊钩必须安装防脱棘爪并每日检查</td>
+</tr>
+<tr>
+  <td class="hazard-name">超载</td>
+  <td class="case-text">嘉定区某项目吊运H型钢丝绳编结处断裂</td>
+  <td class="prevention">严格执行"十不吊"；重量限制器每月校验</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 2.2 倾翻/倒塌事故 -->
+<div class="sub-card border-orange">
+<input type="checkbox" id="s2b" checked>
+<label class="sub-toggle" for="s2b">
+  2.2 倾翻/倒塌事故
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">塔吊倾翻</td>
+  <td class="case-text">2025年5月甘肃定西漳县塔吊顶升加节时上部结构倾翻，致3死。借来的资质、临时雇佣人员操作</td>
+  <td class="prevention">顶升作业必须由持证专业人员操作；严禁借用资质</td>
+</tr>
+<tr>
+  <td class="hazard-name">拆卸坍塌</td>
+  <td class="case-text">2025年9月成都成华区塔机拆卸过程中坍塌，致5死</td>
+  <td class="prevention">编制专项拆卸方案并审批；设专人监护</td>
+</tr>
+<tr>
+  <td class="hazard-name">基础不稳</td>
+  <td class="case-text">2025年10月云南临沧塔吊坍塌致2死3伤</td>
+  <td class="prevention">检查基础螺栓预紧力；6级以上大风停止作业</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 2.3 结构件失效 -->
+<div class="sub-card border-yellow">
+<input type="checkbox" id="s2c" checked>
+<label class="sub-toggle" for="s2c">
+  2.3 结构件失效
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">焊缝开裂</td>
+  <td class="case-text">重要受力焊缝存在裂纹导致倒塌</td>
+  <td class="prevention">重要焊缝定期无损探伤（MT/UT）</td>
+</tr>
+<tr>
+  <td class="hazard-name">连接件松动</td>
+  <td class="case-text">高强度螺栓松动、销轴脱落</td>
+  <td class="prevention">螺栓定期扭矩检查；销轴安装防脱装置</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- ====== 章节三：场车/叉车常见安全隐患 ====== -->
+<div class="section">
+<input type="checkbox" id="s3">
+<label class="toggle-btn" for="s3">
+  <span class="num">3</span> 场车/叉车常见安全隐患
+  <span class="arrow">&#9654;</span>
+</label>
+<div class="content">
+
+<!-- 3.1 翻车事故 -->
+<div class="sub-card border-red">
+<input type="checkbox" id="s3a" checked>
+<label class="sub-toggle" for="s3a">
+  3.1 翻车事故
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">超速转弯</td>
+  <td class="case-text">2024年云南昆明无证驾驶叉车，下坡转弯失误致翻车死亡</td>
+  <td class="prevention">厂区限速；转弯减速；系安全带</td>
+</tr>
+<tr>
+  <td class="hazard-name">超载作业</td>
+  <td class="case-text">2024年江西九江无证驾驶叉车操作失误致倾翻死亡</td>
+  <td class="prevention">严禁超载；超载报警装置正常</td>
+</tr>
+<tr>
+  <td class="hazard-name">操作失误</td>
+  <td class="case-text">市场监管总局2025年11月公布6起叉车事故——全部涉及无证驾驶</td>
+  <td class="prevention">严格落实持证上岗；钥匙专人管理</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 3.2 碰撞/碾压事故 -->
+<div class="sub-card border-orange">
+<input type="checkbox" id="s3b" checked>
+<label class="sub-toggle" for="s3b">
+  3.2 碰撞/碾压事故
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">视野盲区</td>
+  <td class="case-text">2025年7月浙江舟山无证超速驾驶叉车碾压致死；2024年上海奉贤叉车盲区碾压门卫致死</td>
+  <td class="prevention">安装倒车雷达/摄像头；行人隔离通道</td>
+</tr>
+<tr>
+  <td class="hazard-name">货物遮挡视线</td>
+  <td class="case-text">2025年7月广东佛山车间主管无证驾驶叉车，货物遮挡视线撞倒工人致死</td>
+  <td class="prevention">货物遮挡视线时倒车行驶或专人指挥</td>
+</tr>
+<tr>
+  <td class="hazard-name">违规进入货叉下方</td>
+  <td class="case-text">深圳龙华区普工违规进入货叉下方调整枕木被压死</td>
+  <td class="prevention">严禁人员进入货叉下方；设安全警示</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- 3.3 升降系统故障 -->
+<div class="sub-card border-yellow">
+<input type="checkbox" id="s3c" checked>
+<label class="sub-toggle" for="s3c">
+  3.3 升降系统故障
+  <span class="sub-arrow">&#9654;</span>
+</label>
+<div class="sub-content">
+<table>
+<thead><tr><th>隐患</th><th>典型案例</th><th>预防措施</th></tr></thead>
+<tbody>
+<tr>
+  <td class="hazard-name">门架倾斜/油缸泄漏</td>
+  <td class="case-text">起升油缸密封件老化导致货物坠落</td>
+  <td class="prevention">每日检查液压系统；门架链条定期润滑张紧</td>
+</tr>
+<tr>
+  <td class="hazard-name">站人违规升降</td>
+  <td class="case-text">2024年广西来宾工程师违规站在被叉运设备上摔落死亡</td>
+  <td class="prevention">严禁货叉站人升降</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- ====== 章节四：通用安全管理风险 ====== -->
+<div class="section">
+<input type="checkbox" id="s4">
+<label class="toggle-btn" for="s4">
+  <span class="num">4</span> 通用安全管理风险
+  <span class="arrow">&#9654;</span>
+</label>
+<div class="content">
+
+<div class="risk-card">
+  <div class="risk-title">
+    无证操作 <span class="badge badge-critical">极高严重度</span>
+  </div>
+  <div class="risk-desc">6起叉车事故全部涉及无证驾驶。</div>
+  <div class="risk-measure">严格执行持证上岗；建立证书有效期管理台账；对外包人员资质审查</div>
+</div>
+
+<div class="risk-card">
+  <div class="risk-title">
+    未按规定定期检验 <span class="badge badge-high">高严重度</span>
+  </div>
+  <div class="risk-desc">昆明冲顶事故电梯维保记录严重缺失。</div>
+  <div class="risk-measure">提前1-2个月预约报检；张贴检验合格标识；不合格立即停用</div>
+</div>
+
+<div class="risk-card">
+  <div class="risk-title">
+    维保不到位 <span class="badge badge-medium">中严重度</span>
+  </div>
+  <div class="risk-desc">维保走过场、记录造假。</div>
+  <div class="risk-measure">维保单位对维护保养的电梯安全性能负责；建立完整维保记录档案</div>
+</div>
+
+<div class="risk-card">
+  <div class="risk-title">
+    安全附件失效 <span class="badge badge-critical">极高严重度</span>
+  </div>
+  <div class="risk-desc">限位器、制动器、缓冲器、防脱装置、联锁保护等失效属于重大隐患。</div>
+  <div class="risk-measure">每日班前测试安全装置；每月绝缘电阻检测</div>
+</div>
+
+</div>
+</div>
+
+<!-- ====== 章节五：隐患排查要点 ====== -->
+<div class="section">
+<input type="checkbox" id="s5">
+<label class="toggle-btn" for="s5">
+  <span class="num">5</span> 隐患排查要点
+  <span class="arrow">&#9654;</span>
+</label>
+<div class="content">
+
+<!-- 电梯排查要点 -->
+<div class="check-group">
+  <h4><span class="check-icon">&#10003;</span> 电梯排查要点</h4>
+  <ul class="check-list">
+    <li>运行有无异常声响和抖动</li>
+    <li>门关闭是否严密</li>
+    <li>紧急报警装置是否有效</li>
+    <li>限速器-安全钳联动试验</li>
+    <li>制动器制动力矩</li>
+    <li>缓冲器有效性</li>
+    <li>门锁联锁功能</li>
+    <li>维保是否按半月周期执行</li>
+  </ul>
+</div>
+
+<!-- 起重机械排查要点 -->
+<div class="check-group">
+  <h4><span class="check-icon">&#10003;</span> 起重机械排查要点</h4>
+  <ul class="check-list">
+    <li>限位器、重量限制器、制动器</li>
+    <li>钢丝绳断丝磨损</li>
+    <li>受力焊缝、连接螺栓</li>
+    <li>严格遵守"十不吊""八严禁"</li>
+    <li>6级以上大风停止作业</li>
+  </ul>
+</div>
+
+<!-- 叉车排查要点 -->
+<div class="check-group">
+  <h4><span class="check-icon">&#10003;</span> 叉车排查要点</h4>
+  <div class="highlight-box">
+    <h4>"四要素"</h4>
+    <div class="hl-items">
+      <span class="hl-item">使用登记证</span>
+      <span class="hl-item">检验合格标志</span>
+      <span class="hl-item">作业人员证</span>
+      <span class="hl-item">安全管理制度</span>
+    </div>
+    <div class="hl-label" style="margin-top:.8rem">"五必须"</div>
+    <div class="hl-items">
+      <span class="hl-item">必须办理使用登记</span>
+      <span class="hl-item">必须建立档案</span>
+      <span class="hl-item">必须定期检验</span>
+      <span class="hl-item">必须持证上岗</span>
+      <span class="hl-item">必须确保安全装置有效</span>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<!-- 底部动态提示区域 -->
+<div class="alert-box">
+  &#128688; 安全第一：发现重大隐患应立即停用设备并上报。事故调查发现，无证操作和维保缺失是导致特种设备事故的首要原因。
+</div>
+
+</div><!-- .main -->
+
+<!-- 页脚 -->
+<div class="footer">
+  &copy; 2026 赤特机电 &middot; 内部学习平台
+</div>
+
+</body>
+</html>
