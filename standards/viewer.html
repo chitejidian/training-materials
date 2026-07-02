@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>标准文献阅读器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f5f4;height:100vh;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:2px solid #b91c1c;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar a{color:#b91c1c;text-decoration:none;font-size:14px;font-weight:500;white-space:nowrap}
+.topbar .title{font-size:14px;color:#1c1917;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar .dl{font-size:13px;color:#78716c;text-decoration:underline;flex-shrink:0}
+.viewer{flex:1;width:100%;border:none;background:#fff}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#78716c;gap:12px;font-size:15px}
+.loading .spinner{width:40px;height:40px;border:3px solid #e7e5e4;border-top-color:#b91c1c;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{text-align:center;padding:60px 20px;color:#78716c}
+.error h2{font-size:18px;margin-bottom:12px;color:#1c1917}
+.error p{margin-bottom:20px;line-height:1.6}
+.error a{display:inline-block;padding:10px 24px;background:#b91c1c;color:#fff;border-radius:6px;text-decoration:none;font-size:14px}
+.error a:hover{background:#991b1b}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../regulations/index.html">← 标准库</a>
+  <span class="title" id="docTitle">加载中...</span>
+  <a class="dl" id="dlLink" href="#">下载 PDF</a>
+</div>
+
+<div id="loadingArea" class="loading">
+  <div class="spinner"></div>
+  <span>正在加载文档...</span>
+</div>
+
+<div id="errorArea" class="error" style="display:none">
+  <h2>无法在此浏览器中预览 PDF</h2>
+  <p>请尝试使用 Chrome、Edge 或 Firefox 浏览器打开，<br>或直接下载后查看。</p>
+  <a id="errorDlLink" href="#">下载 PDF 文件</a>
+</div>
+
+<iframe id="pdfFrame" class="viewer" style="display:none"></iframe>
+
+<script>
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var file = params.get('file') || params.get('f');
+  
+  if (!file) {
+    document.getElementById('loadingArea').style.display = 'none';
+    document.getElementById('errorArea').style.display = 'block';
+    document.getElementById('docTitle').textContent = '未指定文件';
+    return;
+  }
+  
+  // 设置标题
+  var name = file.split('/').pop().replace(/_/g, ' ').replace(/\.pdf$/i, '');
+  document.title = name;
+  document.getElementById('docTitle').textContent = name;
+  
+  // 设置下载链接
+  var pdfUrl = file;
+  document.getElementById('dlLink').href = pdfUrl;
+  document.getElementById('errorDlLink').href = pdfUrl;
+  
+  var frame = document.getElementById('pdfFrame');
+  var loading = document.getElementById('loadingArea');
+  var error = document.getElementById('errorArea');
+  
+  frame.onload = function() {
+    loading.style.display = 'none';
+    try {
+      // 尝试访问iframe内容，如果跨域会报错但说明已加载
+      var doc = frame.contentDocument || frame.contentWindow.document;
+      if (doc && doc.body && doc.body.innerHTML.length > 0) {
+        frame.style.display = 'block';
+      }
+    } catch(e) {
+      // 跨域但已加载
+      frame.style.display = 'block';
+    }
+  };
+  
+  frame.onerror = function() {
+    loading.style.display = 'none';
+    error.style.display = 'block';
+  };
+  
+  // 超时检测：如果8秒后iframe还没有成功显示
+  setTimeout(function() {
+    if (loading.style.display !== 'none') {
+      loading.style.display = 'none';
+      // 对于移动端或部分浏览器，PDF可能无法内嵌显示
+      // 尝试直接跳转到PDF URL（浏览器会尝试打开）
+      if (/Mobi|Android/i.test(navigator.userAgent)) {
+        window.location.href = pdfUrl;
+      } else {
+        error.style.display = 'block';
+      }
+    }
+  }, 8000);
+  
+  // 加载PDF
+  frame.src = pdfUrl;
+})();
+</script>
+
+</body>
+</html>
