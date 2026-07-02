@@ -3,44 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>特种设备检验员培训教材</title>
+<title>赤特机电 - 内部学习平台</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#1c1917;background:#fafaf9;line-height:1.8;padding:2rem 1rem}
-.container{max-width:800px;margin:0 auto}
-h1{font-size:1.8rem;text-align:center;margin-bottom:.5rem}
-.subtitle{text-align:center;color:#78716c;margin-bottom:2.5rem;font-size:.95rem}
-.card{background:#fff;border:1px solid #d6d3d1;border-radius:8px;padding:1.2rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:1.2rem;text-decoration:none;color:inherit;transition:box-shadow .2s}
-.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
-.card .num{background:#b91c1c;color:#fff;width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0}
-.card .info{flex:1}
-.card .info h3{font-size:1.05rem;margin-bottom:.2rem}
-.card .info p{font-size:.85rem;color:#78716c}
-.card .tag{font-size:.75rem;background:#f0efed;padding:.15rem .5rem;border-radius:3px;color:#92400e;white-space:nowrap}
-.st{font-size:1.1rem;color:#92400e;margin-top:2rem;margin-bottom:.8rem;padding-bottom:.3rem;border-bottom:2px solid #d6d3d1}
-@media(max-width:600px){body{padding:1rem .5rem}.card{flex-direction:column;text-align:center}}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#1c1917;background:#f5f5f4;line-height:1.6}
+.header{background:#b91c1c;color:#fff;padding:2rem 1rem;text-align:center}
+.header h1{font-size:1.6rem;font-weight:700;margin-bottom:.3rem}
+.header p{font-size:.85rem;opacity:.85}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem;max-width:900px;margin:2rem auto;padding:0 1.5rem}
+.card{background:#fff;border-radius:10px;padding:1.8rem 1.5rem;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:.8rem;border:1px solid #e7e5e4;transition:all .2s}
+.card:hover{border-color:#b91c1c;box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px)}
+.card .icon{font-size:2.2rem}
+.card h3{font-size:1.1rem;font-weight:700}
+.card p{font-size:.85rem;color:#78716c;line-height:1.5}
+.card .arrow{margin-top:auto;color:#b91c1c;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.3rem}
+.card .arrow::after{content:"→";font-size:1rem}
+.footer{text-align:center;padding:2rem 1rem;color:#a8a29e;font-size:.75rem}
+@media(max-width:600px){.header h1{font-size:1.3rem}.grid{padding:0 1rem;gap:1rem}}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>特种设备检验员培训教材</h1>
-<p class="subtitle">电梯 · 起重机械 · 场（厂）内专用机动车辆 | 2026年7月</p>
 
-<div class="st">培训方案</div>
-<a class="card" href="training-plan.html"><div class="num">0</div><div class="info"><h3>特种设备检验员系统培训方案</h3><p>12周6阶段培训计划</p></div><span class="tag">HTML</span></a>
+<div class="header">
+<h1>赤特机电 · 内部学习平台</h1>
+<p>特种设备检验 · 持续学习 · 规范操作</p>
+</div>
 
-<div class="st">教材一：电梯</div>
-<a class="card" href="elevator.html"><div class="num">1</div><div class="info"><h3>电梯定期检验实务</h3><p>TSG T7001-2023 + NMTJ细则</p></div><span class="tag">HTML</span></a>
+<div class="grid">
 
-<div class="st">教材二：起重机械</div>
-<a class="card" href="crane.html"><div class="num">2</div><div class="info"><h3>起重机械定期检验实务</h3><p>TSG 51-2023，7大类起重机</p></div><span class="tag">HTML</span></a>
+<a class="card" href="onboarding/index.html">
+<div class="icon">🎓</div>
+<h3>入职培训</h3>
+<p>电梯、起重机械、场车检验员系统培训方案与实务教材，涵盖法律法规、检验流程、记录填写与审核规范。</p>
+<span class="arrow">进入培训</span>
+</a>
 
-<div class="st">教材三：场车</div>
-<a class="card" href="forklift.html"><div class="num">3</div><div class="info"><h3>场（厂）内专用机动车辆定期检验实务</h3><p>TSG 81-2022，叉车/观光车</p></div><span class="tag">HTML</span></a>
-
-<div class="st">教材四：记录填写与审核</div>
-<a class="card" href="audit.html"><div class="num">4</div><div class="info"><h3>检验记录填写与审核规范</h3><p>符号体系、修约规则、审核案例</p></div><span class="tag">HTML</span></a>
+<!-- 后续可在此添加更多模块，例如：
+<a class="card" href="safety/index.html">
+<div class="icon">🛡️</div>
+<h3>安全知识</h3>
+<p>安全生产相关法规与案例。</p>
+<span class="arrow">进入学习</span>
+</a>
+-->
 
 </div>
+
+<div class="footer">© 2026 赤特机电 · 内部学习平台</div>
+
 </body>
 </html>
